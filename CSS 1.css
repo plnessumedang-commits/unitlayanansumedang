@@ -1,0 +1,231 @@
+/* Aturan Dasar Halaman */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Warna latar belakang seluruh layar */
+  background-color: #f9f9fc;
+  
+  /* Membuat elemen .box berada di tengah layar */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container Utama */
+.box {
+  /* Pengaturan Ukuran */
+  width: 1000px;
+  height: 400px;
+
+  /* Pengaturan Warna dengan Transparansi (RGBA) */
+  background-color: rgba(231, 229, 229, 0.5); 
+
+  border: 2px solid #f5f2f2;
+  border-radius: 8px; /* Sudut melengkung */
+
+  /* Bayangan opsional */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  /* Layout Flexbox */
+  display: flex;
+  align-items: center;          /* Posisikan vertikal di tengah */
+  justify-content: flex-start;  /* Posisikan horizontal dari kiri */
+  padding-left: 20px;           /* Jarak dari pinggir kiri box */
+  padding-right: 40px;          /* Jarak dari pinggir kanan box */
+}
+
+/* Gambar Sisi Kiri */
+.box-image {
+  width: 20%;
+  height: 20%;
+  
+  /* Agar gambar tidak terpotong dan proporsi tetap pas */
+  object-fit: contain;
+}
+
+/* Container Form Utama (Dipindahkan ke Kanan Tengah) */
+.form-container {
+  margin-left: auto;      /* Mendorong seluruh blok form ke paling kanan */
+  display: flex;
+  flex-direction: column; /* Menyusun grup form ke bawah */
+  gap: 12px;              /* Jarak antar elemen di dalam form */
+  width: 300px;
+}
+
+/* =================================================== */
+/*   === PENGATUR POSISI ANTARA LABEL DAN INPUT ===    */
+/* =================================================== */
+.form-group {
+  display: flex;
+  flex-direction: column; /* Mengatur Label di ATAS dan Input di BAWAH */
+  gap: 6px;               /* Mengatur JARAK antara label dan kolom input */
+}
+/* =================================================== */
+
+/* Desain Teks Label */
+.form-container label {
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #333333;
+}
+
+/* Desain Kolom Input */
+.form-container input {
+  padding: 8px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+/* Desain Tombol Kirim */
+.form-container button {
+  padding: 10px;
+  background-color: #333333;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.form-container button:hover {
+  background-color: #555555;
+}
+/* Mengatur ukuran kontainer pembungkus gambar */
+.hero-image-wrapper {
+  width: 100%;
+  height: 350px; /* Ubah angka ini untuk mengatur tinggi gambar */
+  overflow: hidden;
+}
+
+/* ==========================================
+   PENGATURAN UKURAN GAMBAR (Ubah Nilai di Sini)
+   ========================================== */
+:root {
+  --lebar-gambar: 100%;    /* Bebas ganti: contoh 800px, 600px, atau 100% */
+  --tinggi-gambar: 400px;  /* Bebas ganti: contoh 300px, 500px, atau auto */
+}
+
+/* Container Utama Beranda */
+.hero-section {
+  max-width: 1000px;
+  margin: 40px auto;
+  background-color: #0c0c0c;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Pembungkus Gambar */
+.hero-image-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Memastikan gambar tetap berada di tengah */
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Styling Gambar Utama */
+.hero-image {
+  /* Menerapkan variabel ukuran di atas & mengabaikan atribut width/height HTML */
+  width: var(--lebar-gambar) !important;
+  height: var(--tinggi-gambar) !important;
+  max-width: 100%; /* Agar tidak meluap keluar layar pada HP/mobile */
+  
+  /* PILIHAN MODE TAMPILAN GAMBAR (Pilih salah satu sesuai kebutuhan): */
+  
+  /* Mode A (Rekomendasi): Menyesuaikan area tanpa gepeng & tanpa memotong gambar secara ekstrem */
+  object-fit: cover; 
+  
+  /* Mode B: Jika Anda TIDAK Wajib ingin gambar terpotong sama sekali (gambar tampil utuh 100%) */
+  /* object-fit: contain; */
+  
+  /* Mode C: Jika ingin gambar dipaksa pas ke ukuran baru meskipun agak terdistorsi/gepeng */
+  /* object-fit: fill; */
+
+  object-position: center;
+  display: block;
+  border-radius: 8px;
+}
+
+/* ========================================== */
+/* KONFIGURASI KHUSUS CETAK LAPORAN           */
+/* ========================================== */
+@media print {
+  /* 1. Sembunyikan elemen navigasi & menu lain */
+  .navbar,
+  .hero-fullscreen,
+  .form-section,
+  .btn-print,
+  .image-wrapper,
+  .content-body > h1,
+  #lima-r,
+  #management-alat,
+  #rambu-rambu {
+    display: none !important;
+  }
+
+  /* 2. Pastikan kontainer utama dan area laporan tetap tampil */
+  body, 
+  .content-card, 
+  .content-body, 
+  .briefing-container, 
+  .report-section {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* 3. Tampilkan judul khusus cetak */
+  .print-title {
+    display: block !important;
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000 !important;
+  }
+
+  /* 4. Format tabel agar pas di kertas */
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  .matrix-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px !important;
+  }
+
+  .matrix-table th, 
+  .matrix-table td {
+    border: 1px solid #000 !important;
+    color: #000 !important;
+    background-color: #fff !important;
+    padding: 8px !important;
+  }
+
+  .matrix-table th {
+    background-color: #e2e8f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .img-preview-matrix {
+    max-width: 120px !important;
+    max-height: 80px !important;
+  }
+}

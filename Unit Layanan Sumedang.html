@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halaman Login - Unit Layanan Sumedang</title>
+  <link rel="stylesheet" href="CSS 1.css">
+  <style>
+    .alert-error {
+      background-color: #f8d7da;
+      color: #842029;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      border: 1px solid #f5c2c7;
+      text-align: center;
+      display: none; /* Sembunyikan default */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Container Utama Form Login -->
+  <main class="box" id="loginPage">
+    <img src="LOGO.png" alt="Logo Unit Layanan Sumedang" class="box-image">
+    
+    <!-- Notifikasi jika terjadi kesalahan input -->
+    <div class="alert-error" id="errorAlert">Username atau password salah!</div>
+
+    <!-- Form dikirim via JS -->
+    <form class="form-container" id="loginForm" onsubmit="prosesLogin(event)">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="admin" placeholder="Masukkan username..." required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" value="123" placeholder="Masukkan password..." required>
+      </div>
+
+      <button type="submit">Log In</button>
+    </form>
+  </main>
+
+  <script>
+    function prosesLogin(event) {
+      event.preventDefault(); // Mencegah form reload halaman
+
+      const usernameInput = document.getElementById('username').value;
+      const passwordInput = document.getElementById('password').value;
+      const errorAlert = document.getElementById('errorAlert');
+
+      // Validasi Username & Password (sesuai value default: admin / 123)
+      if (usernameInput === 'admin' && passwordInput === '123') {
+        // Arahkan ke file dashboard HTML Anda
+        window.location.href = "Halaman Ke 1.html"; 
+      } else {
+        // Tampilkan pesan error jika login gagal
+        errorAlert.style.display = 'block';
+      }
+    }
+  </script>
+
+</body>
+</html>
