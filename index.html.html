@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Unit Layanan Sumedang</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background-color: #4681bb; color: #0a639e; padding-bottom: 40px; }
+
+    .navbar {
+      background-color: rgba(15, 70, 160, 0.4);
+      backdrop-filter: blur(8px);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 30px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    }
+    .navbar .logo { color: white; font-weight: bold; font-size: 18px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .navbar-menu { display: flex; align-items: center; gap: 10px; }
+    .navbar-menu a {
+      color: #ffffff; text-decoration: none; padding: 6px 12px; border-radius: 6px;
+      transition: 0.3s; cursor: pointer; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .navbar-menu a:hover, .navbar-menu a.active { background-color: #2563eb; color: white; }
+    .btn-logout { background-color: #ef4444; color: white !important; font-weight: bold; margin-left: 10px; }
+    .btn-logout:hover { background-color: #dc2626 !important; }
+
+    .hero-fullscreen { width: 100%; height: 100vh; overflow: hidden; display: none; }
+    .full-image { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+
+    .content-card {
+      max-width: 1200px; margin: 90px auto 40px auto; background-color: white;
+      border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); display: none;
+    }
+    .content-card.wide-card { max-width: 95%; }
+    .content-card.active, .hero-fullscreen.active { display: block; }
+
+    .image-wrapper { width: 100%; height: auto; overflow: hidden; }
+    .menu-image { width: 100%; height: auto; object-fit: contain; display: block; }
+
+    .content-body { padding: 35px 25px; color: #1e293b; }
+    .content-body h1 { font-size: 26px; color: #0f46a0; margin-bottom: 15px; }
+    .content-body h2 { font-size: 18px; color: #0f46a0; margin-bottom: 15px; }
+
+    .briefing-container { display: flex; gap: 25px; margin-top: 20px; align-items: flex-start; }
+    .form-section { flex: 1; min-width: 340px; background-color: #f8fafc; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .report-section { flex: 2; background-color: #ffffff; padding: 24px; border-radius: 10px; border: 1px solid #e2e8f0; }
+
+    .form-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; padding: 10px; border: 1px solid #cbd5e1; background-color: #e2e8f0; color: #334155; font-weight: bold; border-radius: 6px; cursor: pointer; text-align: center; }
+    .tab-btn.active-tab-masuk { background-color: #16a34a; color: white; border-color: #15803d; }
+    .tab-btn.active-tab-keluar { background-color: #dc2626; color: white; border-color: #b91c1c; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group.full-width { grid-column: span 2; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #334155; font-size: 13px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; font-family: inherit; }
+
+    .btn-submit { background-color: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; margin-top: 10px; }
+    .btn-submit-keluar { background-color: #dc2626; }
+    .btn-submit:hover { background-color: #1d4ed8; }
+    .btn-print { background-color: #059669; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; }
+
+    .filter-box { display: flex; gap: 10px; align-items: center; background-color: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+    .filter-box label { font-size: 12px; font-weight: bold; color: #475569; }
+    .filter-box input { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; }
+    .btn-filter { background-color: #0f46a0; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-reset { background-color: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+
+    .table-responsive { overflow-x: auto; }
+    .matrix-table, .stock-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    .matrix-table th { background-color: #2d6a4f; color: white; padding: 12px; border: 1px solid #1b4332; text-align: center; }
+    .matrix-table td { border: 1px solid #cbd5e1; padding: 8px; text-align: center; vertical-align: middle; height: 100px; }
+    .matrix-table td.col-tanggal { background-color: #f8fafc; font-weight: bold; color: #334155; width: 110px; }
+    .matrix-table td.col-tanjungsari { background-color: #e0f2fe; }
+
+    .stock-table th { background-color: #0f46a0; color: white; padding: 10px 8px; border: 1px solid #0c3880; text-align: center; }
+    .stock-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; vertical-align: middle; }
+    .stock-table tr:nth-child(even) { background-color: #f8fafc; }
+
+    .img-preview-matrix { max-width: 100px; max-height: 75px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto; }
+    .text-center { text-align: center !important; }
+
+    .btn-edit { background-color: #f59e0b; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; margin-bottom: 3px; }
+    .btn-edit:hover { background-color: #d97706; }
+    .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+    .btn-delete:hover { background-color: #dc2626; }
+    .action-cell { display: flex; flex-direction: column; gap: 4px; justify-content: center; align-items: center; }
+
+    .badge-satuan { display: inline-block; padding: 2px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; background-color: #e0f2fe; color: #0369a1; }
+    .badge-transaksi { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: bold; }
+    .badge-masuk { background-color: #dcfce7; color: #15803d; }
+    .badge-keluar { background-color: #fee2e2; color: #b91c1c; }
+    .txt-masuk { color: #16a34a; font-weight: bold; }
+    .txt-keluar { color: #dc2626; font-weight: bold; }
+    .txt-sisa { color: #0f46a0; font-weight: bold; background-color: #eff6ff; }
+    .divider-title { margin: 25px 0 10px 0; padding-top: 15px; border-top: 2px dashed #cbd5e1; }
+
+    @media print { .btn-edit, .btn-delete, .action-header { display: none !important; } }
+  </style>
+</head>
+<body>
+
+  <!-- Navigasi -->
+  <div class="navbar">
+    <div class="logo">Unit Layanan Sumedang</div>
+    <div class="navbar-menu">
+      <a class="nav-btn active" onclick="switchMenu('Home', this)">Beranda</a>
+      <a class="nav-btn" onclick="switchMenu('safety-briefing', this)">Safety Briefing</a>
+      <a class="nav-btn" onclick="switchMenu('lima-r', this)">5R</a>
+      <a class="nav-btn" onclick="switchMenu('management-alat', this)">Management Alat</a>
+      <a class="nav-btn" onclick="switchMenu('rambu-rambu', this)">Rambu-rambu</a>
+      <a class="nav-btn" onclick="switchMenu('monitoring-kesehatan', this)">Monitoring Kesehatan</a>
+      <a class="nav-btn" onclick="switchMenu('stock-barang', this)">Stock Barang</a>
+      <a class="btn-logout" onclick="if(confirm('Apakah Anda yakin ingin keluar?')) { window.location.href='Unit Layanan Sumedang.html'; }">Keluar</a>
+    </div>
+  </div>
+
+  <!-- Beranda -->
+  <main id="Home" class="hero-fullscreen active">
+    <img src="Gambar Beranda.jpg" alt="Gambar Beranda" class="full-image" />
+  </main>
+
+  <!-- Safety Briefing -->
+  <main id="safety-briefing" class="content-card wide-card">
+    <div class="image-wrapper"><img src="Safety Briefing.jpg" class="menu-image" onerror="this.style.display='none'" /></div>
+    <div class="content-body">
+      <h1>Safety Briefing</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <h2>Input Safety Briefing</h2>
+          <form id="formSafetyBriefing" onsubmit="tambahData(event, 'SafetyBriefing', 'tabelBodySafetyBriefing')">
+            <div class="form-group"><label>Tanggal Pelaksanaan:</label><input type="date" id="tanggalSafetyBriefing" required></div>
+            <div class="form-group"><label>Nama Area:</label>
+              <select id="ULPSafetyBriefing" required>
+                <option value="">-- Pilih ULP --</option>
+                <option value="Tanjung Sari">Tanjung Sari</option>
+                <option value="Sumedang Kota">Sumedang Kota</option>
+                <option value="Majalengka">Majalengka</option>
+                <option value="Jatiwangi">Jatiwangi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Dokumentasi Foto:</label><input type="file" id="fotoSafetyBriefing" accept="image/*"></div>
+            <button type="submit" class="btn-submit">Simpan Data</button>
+          </form>
+        </div>
+        <div class="report-section">
+          <h2 id="titleSafetyBriefing">Hasil Laporan Safety Briefing</h2>
+          <div class="filter-box">
+            <div><label>Dari Tanggal:</label><input type="date" id="filterStartSafetyBriefing"></div>
+            <div><label>Sampai Tanggal:</label><input type="date" id="filterEndSafetyBriefing"></div>
+            <button class="btn-filter" onclick="renderTable('SafetyBriefing', 'tabelBodySafetyBriefing')">Filter</button>
+            <button class="btn-reset" onclick="resetFilterMatrix('SafetyBriefing', 'tabelBodySafetyBriefing')">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanjung Sari</th>
+                  <th>Sumedang Kota</th>
+                  <th>Majalengka</th>
+                  <th>Jatiwangi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodySafetyBriefing"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanDirect('tabelBodySafetyBriefing', 'SafetyBriefing', 'LAPORAN SAFETY BRIEFING')">🖨️ Cetak Laporan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 5R -->
+  <main id="lima-r" class="content-card wide-card">
+    <div class="image-wrapper"><img src="5R.jpg" class="menu-image" onerror="this.style.display='none'" /></div>
+    <div class="content-body">
+      <h1>Penerapan 5R</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <h2>Input Dokumentasi 5R</h2>
+          <form id="form5R" onsubmit="tambahData(event, '5R', 'tabelBody5R')">
+            <div class="form-group"><label>Tanggal Pelaksanaan:</label><input type="date" id="tanggal5R" required></div>
+            <div class="form-group"><label>Nama Area:</label>
+              <select id="ULP5R" required>
+                <option value="">-- Pilih ULP --</option>
+                <option value="Tanjung Sari">Tanjung Sari</option>
+                <option value="Sumedang Kota">Sumedang Kota</option>
+                <option value="Majalengka">Majalengka</option>
+                <option value="Jatiwangi">Jatiwangi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Dokumentasi Foto:</label><input type="file" id="foto5R" accept="image/*"></div>
+            <button type="submit" class="btn-submit">Simpan Data</button>
+          </form>
+        </div>
+        <div class="report-section">
+          <h2 id="title5R">Hasil Laporan Penerapan 5R</h2>
+          <div class="filter-box">
+            <div><label>Dari Tanggal:</label><input type="date" id="filterStart5R"></div>
+            <div><label>Sampai Tanggal:</label><input type="date" id="filterEnd5R"></div>
+            <button class="btn-filter" onclick="renderTable('5R', 'tabelBody5R')">Filter</button>
+            <button class="btn-reset" onclick="resetFilterMatrix('5R', 'tabelBody5R')">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanjung Sari</th>
+                  <th>Sumedang Kota</th>
+                  <th>Majalengka</th>
+                  <th>Jatiwangi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBody5R"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanDirect('tabelBody5R', '5R', 'LAPORAN PENERAPAN 5R')">🖨️ Cetak Laporan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Management Alat -->
+  <main id="management-alat" class="content-card wide-card">
+    <div class="image-wrapper"><img src="Management Alat.jpg" class="menu-image" onerror="this.style.display='none'" /></div>
+    <div class="content-body">
+      <h1>Management Alat</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <h2>Input Inspeksi Alat</h2>
+          <form id="formAlat" onsubmit="tambahData(event, 'Alat', 'tabelBodyAlat')">
+            <div class="form-group"><label>Tanggal Inspeksi:</label><input type="date" id="tanggalAlat" required></div>
+            <div class="form-group"><label>Nama Area:</label>
+              <select id="ULPAlat" required>
+                <option value="">-- Pilih ULP --</option>
+                <option value="Tanjung Sari">Tanjung Sari</option>
+                <option value="Sumedang Kota">Sumedang Kota</option>
+                <option value="Majalengka">Majalengka</option>
+                <option value="Jatiwangi">Jatiwangi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Dokumentasi Foto:</label><input type="file" id="fotoAlat" accept="image/*"></div>
+            <button type="submit" class="btn-submit">Simpan Data</button>
+          </form>
+        </div>
+        <div class="report-section">
+          <h2 id="titleAlat">Hasil Laporan Management Alat</h2>
+          <div class="filter-box">
+            <div><label>Dari Tanggal:</label><input type="date" id="filterStartAlat"></div>
+            <div><label>Sampai Tanggal:</label><input type="date" id="filterEndAlat"></div>
+            <button class="btn-filter" onclick="renderTable('Alat', 'tabelBodyAlat')">Filter</button>
+            <button class="btn-reset" onclick="resetFilterMatrix('Alat', 'tabelBodyAlat')">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanjung Sari</th>
+                  <th>Sumedang Kota</th>
+                  <th>Majalengka</th>
+                  <th>Jatiwangi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodyAlat"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanDirect('tabelBodyAlat', 'Alat', 'LAPORAN MANAGEMENT ALAT')">🖨️ Cetak Laporan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Rambu-rambu -->
+  <main id="rambu-rambu" class="content-card wide-card">
+    <div class="image-wrapper"><img src="Rambu Rambu.jpg" class="menu-image" onerror="this.style.display='none'" /></div>
+    <div class="content-body">
+      <h1>Rambu-Rambu Keselamatan</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <h2>Input Inspeksi Rambu</h2>
+          <form id="formRambu" onsubmit="tambahData(event, 'Rambu', 'tabelBodyRambu')">
+            <div class="form-group"><label>Tanggal Inspeksi:</label><input type="date" id="tanggalRambu" required></div>
+            <div class="form-group"><label>Nama Area:</label>
+              <select id="ULPRambu" required>
+                <option value="">-- Pilih ULP --</option>
+                <option value="Tanjung Sari">Tanjung Sari</option>
+                <option value="Sumedang Kota">Sumedang Kota</option>
+                <option value="Majalengka">Majalengka</option>
+                <option value="Jatiwangi">Jatiwangi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Dokumentasi Foto:</label><input type="file" id="fotoRambu" accept="image/*"></div>
+            <button type="submit" class="btn-submit">Simpan Data</button>
+          </form>
+        </div>
+        <div class="report-section">
+          <h2 id="titleRambu">Hasil Laporan Rambu-Rambu</h2>
+          <div class="filter-box">
+            <div><label>Dari Tanggal:</label><input type="date" id="filterStartRambu"></div>
+            <div><label>Sampai Tanggal:</label><input type="date" id="filterEndRambu"></div>
+            <button class="btn-filter" onclick="renderTable('Rambu', 'tabelBodyRambu')">Filter</button>
+            <button class="btn-reset" onclick="resetFilterMatrix('Rambu', 'tabelBodyRambu')">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Tanjung Sari</th>
+                  <th>Sumedang Kota</th>
+                  <th>Majalengka</th>
+                  <th>Jatiwangi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodyRambu"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanDirect('tabelBodyRambu', 'Rambu', 'LAPORAN INSPEKSI RAMBU-RAMBU')">🖨️ Cetak Laporan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Monitoring Kesehatan (Pengubahan Hasil Tensimeter) -->
+  <main id="monitoring-kesehatan" class="content-card wide-card">
+    <div class="content-body">
+      <h1>Monitoring Kesehatan Personil</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <h2>Input Pemeriksaan Kesehatan</h2>
+          <form id="formKesehatan" onsubmit="tambahDataKesehatan(event)">
+            <div class="form-group"><label>Tanggal Pemeriksaan:</label><input type="date" id="tanggalKesehatan" required></div>
+            <div class="form-group"><label>Nama Personil:</label><input type="text" id="namaPersonil" placeholder="Contoh: Budi Santoso" required></div>
+            <div class="form-group"><label>Area ULP:</label>
+              <select id="areaKesehatan" required>
+                <option value="">-- Pilih Area --</option>
+                <option value="ULP Tanjungsari">ULP Tanjungsari</option>
+                <option value="ULP Sumedang">ULP Sumedang</option>
+                <option value="ULP Majalengka">ULP Majalengka</option>
+                <option value="ULP Jatiwangi">ULP Jatiwangi</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Suhu Badan (°C):</label><input type="number" step="0.1" id="suhuBadan" placeholder="36.5" required></div>
+            
+            <!-- Penggantian Hasil Termometer Menjadi Hasil Tensimeter -->
+            <div class="form-group"><label>Hasil Tensimeter (Tekanan Darah):</label>
+              <select id="hasilTensimeter" required>
+                <option value="Normal (120/80 mmHg)">Normal (120/80 mmHg)</option>
+                <option value="Pre-Hipertensi (120-139/80-89 mmHg)">Pre-Hipertensi (120-139/80-89 mmHg)</option>
+                <option value="Hipertensi Tahap 1 (140-159/90-99 mmHg)">Hipertensi Tahap 1 (140-159/90-99 mmHg)</option>
+                <option value="Hipertensi Tahap 2 (≥ 160/≥ 100 mmHg)">Hipertensi Tahap 2 (≥ 160/≥ 100 mmHg)</option>
+                <option value="Hipotensi (< 90/60 mmHg)">Hipotensi (< 90/60 mmHg)</option>
+              </select>
+            </div>
+
+            <div class="form-group"><label>Oxymeter SpO2 (%):</label><input type="number" id="oxymeter" placeholder="98" min="0" max="100" required></div>
+            <div class="form-group"><label>Eviden Foto:</label><input type="file" id="evidenKesehatan" accept="image/*"></div>
+            <button type="submit" class="btn-submit">Simpan Data Kesehatan</button>
+          </form>
+        </div>
+
+        <div class="report-section">
+          <h2 id="titleKesehatan">Hasil Laporan Monitoring Kesehatan</h2>
+          <div class="filter-box">
+            <div>
+              <label>Cari Nama Personil:</label>
+              <input type="text" id="filterNamaKesehatan" placeholder="Ketik nama personil..." onkeyup="renderTableKesehatan()">
+            </div>
+            <button class="btn-reset" onclick="resetFilterKesehatan()">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;">No</th>
+                  <th>Tanggal</th>
+                  <th>Nama Personil</th>
+                  <th>Area</th>
+                  <th>Suhu (°C)</th>
+                  <th>Hasil Tensimeter</th>
+                  <th>Oxymeter (%)</th>
+                  <th>Eviden Foto</th>
+                  <th class="action-header">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodyKesehatan"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanKesehatan()">🖨️ Cetak Laporan Kesehatan</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Stock Barang -->
+  <main id="stock-barang" class="content-card wide-card">
+    <div class="content-body">
+      <h1>Management Stock Barang</h1>
+      <div class="briefing-container">
+        <div class="form-section">
+          <div class="form-tabs">
+            <button class="tab-btn active-tab-masuk" id="btnTabMasuk" onclick="switchStockTab('masuk')">Pemasukan Barang</button>
+            <button class="tab-btn" id="btnTabKeluar" onclick="switchStockTab('keluar')">Pengeluaran Barang</button>
+          </div>
+          <h2 id="formStockTitle">Form Input Pemasukan Barang</h2>
+          <form id="formStockBarang" onsubmit="tambahTransaksiStock(event)">
+            <input type="hidden" id="jenisTransaksi" value="masuk">
+            <div class="form-grid">
+              <div class="form-group full-width"><label>Tanggal Transaksi:</label><input type="date" id="tanggalStock" required></div>
+              <div class="form-group full-width"><label>Nama Barang:</label>
+                <select id="namaBarang" required>
+                  <option value="">-- Pilih Nama Barang --</option>
+                  <option value="Tangga Fiberglass 36 Feet / 11 Meter">Tangga Fiberglass 36 Feet / 11 Meter</option>
+                  <option value="Tangga Teleskopik 7 Meter">Tangga Teleskopik 7 Meter</option>
+                  <option value="Rachet Puller / Tracktang (2 ton)">Rachet Puller / Tracktang (2 ton)</option>
+                  <option value="Wire Grips 70-240 mm² (2 Ton)">Wire Grips 70-240 mm² (2 Ton)</option>
+                  <option value="Wire Rope Cutter 32&quot; (s.d. 240 mm²)">Wire Rope Cutter 32" (s.d. 240 mm²)</option>
+                  <option value="Tools Box Set 66 Pcs (Box Besi)">Tools Box Set 66 Pcs (Box Besi)</option>
+                  <option value="Telescopic Hot Stick 10,5 m">Telescopic Hot Stick 10,5 m</option>
+                  <option value="Hand Press Baterai Electric 400mm">Hand Press Baterai Electric 400mm</option>
+                  <option value="Wrance Impact Electric">Wrance Impact Electric</option>
+                  <option value="Chainsaw 16 Inch + Kikir + BBM + Oli">Chainsaw 16 Inch + Kikir + BBM + Oli</option>
+                  <option value="Tali Tambang Nylon 12mm">Tali Tambang Nylon 12mm</option>
+                  <option value="Katrol (Untuk Tali Tambang)">Katrol (Untuk Tali Tambang)</option>
+                  <option value="Lampu Sorot LED 45 W Warna Kuning">Lampu Sorot LED 45 W Warna Kuning</option>
+                  <option value="Lampu Senter Emergency LED 15W Rechareable 3500 mAh">Lampu Senter Emergency LED 15W Rechareable 3500 mAh</option>
+                  <option value="Megaphone">Megaphone</option>
+                  <option value="TOA Horn Paging Speaker">TOA Horn Paging Speaker</option>
+                  <option value="Frame Gergaji Besi">Frame Gergaji Besi</option>
+                  <option value="Mata Gergaji Besi">Mata Gergaji Besi</option>
+                  <option value="Gerindra Potong Cordless">Gerindra Potong Cordless</option>
+                  <option value="Radio HT Digital">Radio HT Digital</option>
+                  <option value="Radio POC Digital + Paket Data 5 Thn">Radio POC Digital + Paket Data 5 Thn</option>
+                  <option value="Kunci Inggris 15&quot;">Kunci Inggris 15"</option>
+                  <option value="Meteran 5 Meter">Meteran 5 Meter</option>
+                  <option value="Sikat Kawat Baja">Sikat Kawat Baja</option>
+                  <option value="Golok sedang">Golok sedang</option>
+                  <option value="Gunting Pohon / Tree Pruner 6 Meter">Gunting Pohon / Tree Pruner 6 Meter</option>
+                  <option value="Kain Majun">Kain Majun</option>
+                  <option value="NH Fuse Puller 1250A">NH Fuse Puller 1250A</option>
+                  <option value="Tang Press Hidrolik (Dies 16mm² - 300mm²)">Tang Press Hidrolik (Dies 16mm² - 300mm²)</option>
+                  <option value="Tang Ampere Digital (AVO Meter)">Tang Ampere Digital (AVO Meter)</option>
+                  <option value="Digital Insulation Tester (1.000 Volt DC)">Digital Insulation Tester (1.000 Volt DC)</option>
+                  <option value="Analog Insulation Tester (10.000 Volt DC)">Analog Insulation Tester (10.000 Volt DC)</option>
+                  <option value="Phase Checker / Squence Indicator">Phase Checker / Squence Indicator</option>
+                  <option value="Sarung Tangan tahan tegangan / Sarung Tangan Isolasi 20 kV Class 3">Sarung Tangan tahan tegangan / Sarung Tangan Isolasi 20 kV Class 3</option>
+                  <option value="Alat Lock Out Tag Out LOTTO KIT">Alat Lock Out Tag Out LOTTO KIT</option>
+                  <option value="Safety Line 300m">Safety Line 300m</option>
+                  <option value="Sepatu tahan tegangan / Sepatu Isolasi 20 kV Class 3">Sepatu tahan tegangan / Sepatu Isolasi 20 kV Class 3</option>
+                  <option value="Non Contact High Voltage Detector Stick 2 Range 50V-1,5KV &amp; 1,5KV-132KV">Non Contact High Voltage Detector Stick 2 Range 50V-1,5KV &amp; 1,5KV-132KV</option>
+                  <option value="Grounding Cluster 20 kV">Grounding Cluster 20 kV</option>
+                  <option value="Full Body Harness With Lanyard Double Big Hook">Full Body Harness With Lanyard Double Big Hook</option>
+                  <option value="Trafic Cone 75 Cm">Trafic Cone 75 Cm</option>
+                  <option value="Rantai Plastik 6 mm² Panjang 25 m Warna Merah">Rantai Plastik 6 mm² Panjang 25 m Warna Merah</option>
+                  <option value="Papan Peringatan Ada Pekerjaan dari Plat Besi">Papan Peringatan Ada Pekerjaan dari Plat Besi</option>
+                  <option value="APAR Dry Chemical">APAR Dry Chemical</option>
+                  <option value="Kotak P3K">Kotak P3K</option>
+                  <option value="CCTV Unit + Paket Data">CCTV Unit + Paket Data</option>
+                  <option value="Smartphone Pelaporan RAM min 8 GB ROM min 256 GB">Smartphone Pelaporan RAM min 8 GB ROM min 256 GB</option>
+                  <option value="Charger Mobil (Fast Charging)">Charger Mobil (Fast Charging)</option>
+                  <option value="Pulsa Internet (Sebulan 100 rb)">Pulsa Internet (Sebulan 100 rb)</option>
+                  <option value="Radio Base Digital">Radio Base Digital</option>
+                  <option value="Kabel Coaxial RG-8">Kabel Coaxial RG-8</option>
+                  <option value="Antena High Gain RG-8">Antena High Gain RG-8</option>
+                  <option value="Power Supply 30A">Power Supply 30A</option>
+                  <option value="Drone Camera">Drone Camera</option>
+                  <option value="Amp Stick 20 kV">Amp Stick 20 kV</option>
+                  <option value="Volt Stick 20 kV">Volt Stick 20 kV</option>
+                  <option value="Laptop i7 Gen 13 ram 16 GB">Laptop i7 Gen 13 ram 16 GB</option>
+                  <option value="Chain Block / Katrol 5 Ton 15 Meter (Untuk Trafo)">Chain Block / Katrol 5 Ton 15 Meter (Untuk Trafo)</option>
+                  <option value="Heating Torch / Pembakar LPG">Heating Torch / Pembakar LPG</option>
+                  <option value="Gas Regulator + Selang 1,8 m">Gas Regulator + Selang 1,8 m</option>
+                  <option value="LPG 5,5 Kg">LPG 5,5 Kg</option>
+                  <option value="Thermovision">Thermovision</option>
+                  <option value="Palu Godam / Sledge Hammer">Palu Godam / Sledge Hammer</option>
+                  <option value="Lemari Locker">Lemari Locker</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Merk:</label><input type="text" id="merkBarang" placeholder="Contoh: Tekiro" required></div>
+              <div class="form-group"><label>Kode Barang:</label><input type="text" id="kodeBarang" placeholder="Contoh: BRG-001" required></div>
+              <div class="form-group"><label>No. Seri / Serial Number:</label><input type="text" id="noSeri" placeholder="Contoh: SN-88942" required></div>
+              <div class="form-group"><label>Warna:</label><input type="text" id="warnaBarang" placeholder="Contoh: Hitam" required></div>
+              <div class="form-group"><label>Jumlah:</label><input type="number" id="jumlahBarang" min="1" value="1" required></div>
+              <div class="form-group"><label>Satuan Barang:</label>
+                <select id="satuanBarang" required>
+                  <option value="unit">Unit</option>
+                  <option value="set">Set</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" id="btnSubmitStock" class="btn-submit">Simpan Pemasukan</button>
+          </form>
+        </div>
+
+        <div class="report-section">
+          <h2 id="titleHistoryStock">Riwayat Transaksi Barang (Berdasarkan Tanggal)</h2>
+          <div class="filter-box">
+            <div><label>Dari Tanggal:</label><input type="date" id="filterStart"></div>
+            <div><label>Sampai Tanggal:</label><input type="date" id="filterEnd"></div>
+            <button class="btn-filter" onclick="renderHistoryTable()">Filter</button>
+            <button class="btn-reset" onclick="resetFilter()">Reset</button>
+          </div>
+          <div class="table-responsive">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;">No</th>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Kode</th>
+                  <th>Nama Barang</th>
+                  <th>Merk</th>
+                  <th>No. Seri</th>
+                  <th>Jumlah</th>
+                  <th>Satuan</th>
+                  <th class="action-header">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodyHistory"></tbody>
+            </table>
+          </div>
+
+          <h2 class="divider-title">Ringkasan Total Sisa Stok Saat Ini</h2>
+          <div class="table-responsive">
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th style="width: 30px;">No</th>
+                  <th>Kode</th>
+                  <th>Nama Barang</th>
+                  <th>Merk</th>
+                  <th>No. Seri</th>
+                  <th>Warna</th>
+                  <th>Satuan</th>
+                  <th>Total Masuk</th>
+                  <th>Total Keluar</th>
+                  <th>Sisa Stok</th>
+                </tr>
+              </thead>
+              <tbody id="tabelBodyStock"></tbody>
+            </table>
+          </div>
+          <button type="button" class="btn-print" onclick="cetakLaporanStock()">🖨️ Cetak Laporan Complete</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const storeData = { SafetyBriefing: {}, '5R': {}, Alat: {}, Rambu: {} };
+    let dataKesehatanList = [];
+    let transactionHistory = [];
+    let inventoryMap = {};
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const dateIds = ['tanggalSafetyBriefing', 'tanggal5R', 'tanggalAlat', 'tanggalRambu', 'tanggalKesehatan', 'tanggalStock'];
+      dateIds.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.valueAsDate = new Date();
+      });
+      renderHistoryTable();
+      renderStockTable();
+      renderTableKesehatan();
+    });
+
+    function switchMenu(menuId, clickedLink) {
+      document.querySelectorAll('.content-card, .hero-fullscreen').forEach(card => card.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(menuId).classList.add('active');
+      clickedLink.classList.add('active');
+    }
+
+    function formatIndoDate(dateStr) {
+      if (!dateStr) return '';
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    /* MATRIKS LOGIC */
+    function tambahData(event, keyCategory, tbodyId) {
+      event.preventDefault();
+      const rawTanggal = document.getElementById(`tanggal${keyCategory}`).value;
+      if (!rawTanggal) return;
+      const formattedDate = formatIndoDate(rawTanggal);
+      const ulp = document.getElementById(`ULP${keyCategory}`).value;
+      const fotoInput = document.getElementById(`foto${keyCategory}`);
+
+      const processSave = (imgSrc) => {
+        if (!storeData[keyCategory][formattedDate]) {
+          storeData[keyCategory][formattedDate] = {
+            rawDate: rawTanggal,
+            areas: { 'Tanjung Sari': null, 'Sumedang Kota': null, 'Majalengka': null, 'Jatiwangi': null }
+          };
+        }
+        storeData[keyCategory][formattedDate].areas[ulp] = { img: imgSrc };
+        renderTable(keyCategory, tbodyId);
+        document.getElementById(`form${keyCategory}`).reset();
+        document.getElementById(`tanggal${keyCategory}`).valueAsDate = new Date();
+        alert('Data berhasil disimpan!');
+      };
+
+      if (fotoInput.files && fotoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => processSave(e.target.result);
+        reader.readAsDataURL(fotoInput.files[0]);
+      } else {
+        const oldImg = storeData[keyCategory][formattedDate]?.areas[ulp]?.img || '';
+        processSave(oldImg);
+      }
+    }
+
+    function renderTable(keyCategory, tbodyId) {
+      const tbody = document.getElementById(tbodyId);
+      tbody.innerHTML = '';
+      const startDate = document.getElementById(`filterStart${keyCategory}`).value;
+      const endDate = document.getElementById(`filterEnd${keyCategory}`).value;
+      const dataObj = storeData[keyCategory];
+      const tanggalKeys = Object.keys(dataObj);
+      let countData = 0;
+
+      tanggalKeys.forEach(tgl => {
+        const item = dataObj[tgl];
+        if (startDate && endDate && (item.rawDate < startDate || item.rawDate > endDate)) return;
+        countData++;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td class="col-tanggal">${tgl}</td>`;
+
+        ['Tanjung Sari', 'Sumedang Kota', 'Majalengka', 'Jatiwangi'].forEach(area => {
+          const itemData = item.areas[area];
+          let cellHtml = area === 'Tanjung Sari' ? '<td class="col-tanjungsari">' : '<td>';
+          if (itemData && itemData.img) {
+            cellHtml += `<img src="${itemData.img}" class="img-preview-matrix">
+              <div class="action-cell" style="margin-top: 5px;">
+                <button class="btn-edit" onclick="editMatrixData('${keyCategory}', '${tgl}', '${area}')">Edit</button>
+                <button class="btn-delete" onclick="hapusMatrixData('${keyCategory}', '${tgl}', '${area}', '${tbodyId}')">Hapus</button>
+              </div>`;
+          }
+          cellHtml += '</td>';
+          row.innerHTML += cellHtml;
+        });
+        tbody.appendChild(row);
+      });
+
+      if (countData === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 15px;">Belum ada data laporan.</td></tr>`;
+      }
+    }
+
+    function editMatrixData(keyCategory, tgl, area) {
+      const itemData = storeData[keyCategory][tgl];
+      if (!itemData) return;
+      document.getElementById(`tanggal${keyCategory}`).value = itemData.rawDate;
+      document.getElementById(`ULP${keyCategory}`).value = area;
+      alert(`Silakan ubah data/foto pada form dan tekan 'Simpan Data' untuk memperbarui.`);
+    }
+
+    function hapusMatrixData(keyCategory, tgl, area, tbodyId) {
+      if (confirm(`Apakah Anda yakin ingin menghapus data ULP ${area} tanggal ${tgl}?`)) {
+        storeData[keyCategory][tgl].areas[area] = null;
+        renderTable(keyCategory, tbodyId);
+      }
+    }
+
+    function resetFilterMatrix(keyCategory, tbodyId) {
+      document.getElementById(`filterStart${keyCategory}`).value = '';
+      document.getElementById(`filterEnd${keyCategory}`).value = '';
+      renderTable(keyCategory, tbodyId);
+    }
+
+    /* MONITORING KESEHATAN LOGIC (TENSIMETER) */
+    let editKesehatanIndex = null;
+
+    function tambahDataKesehatan(event) {
+      event.preventDefault();
+      const rawTanggal = document.getElementById('tanggalKesehatan').value;
+      const nama = document.getElementById('namaPersonil').value;
+      const area = document.getElementById('areaKesehatan').value;
+      const suhu = document.getElementById('suhuBadan').value;
+      const tensimeter = document.getElementById('hasilTensimeter').value;
+      const oxymeter = document.getElementById('oxymeter').value;
+      const fotoInput = document.getElementById('evidenKesehatan');
+
+      const processSave = (imgSrc) => {
+        const payload = {
+          rawDate: rawTanggal,
+          tanggal: formatIndoDate(rawTanggal),
+          nama: nama, area: area, suhu: suhu,
+          tensimeter: tensimeter, oxymeter: oxymeter, img: imgSrc
+        };
+
+        if (editKesehatanIndex !== null) {
+          dataKesehatanList[editKesehatanIndex] = payload;
+          editKesehatanIndex = null;
+          alert('Data kesehatan berhasil diperbarui!');
+        } else {
+          dataKesehatanList.push(payload);
+          alert('Data kesehatan berhasil disimpan!');
+        }
+
+        renderTableKesehatan();
+        document.getElementById('formKesehatan').reset();
+        document.getElementById('tanggalKesehatan').valueAsDate = new Date();
+      };
+
+      if (fotoInput.files && fotoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => processSave(e.target.result);
+        reader.readAsDataURL(fotoInput.files[0]);
+      } else {
+        const oldImg = editKesehatanIndex !== null ? dataKesehatanList[editKesehatanIndex].img : '';
+        processSave(oldImg);
+      }
+    }
+
+    function renderTableKesehatan() {
+      const tbody = document.getElementById('tabelBodyKesehatan');
+      tbody.innerHTML = '';
+      const searchNama = document.getElementById('filterNamaKesehatan').value.toLowerCase().trim();
+
+      const filteredData = dataKesehatanList.filter(item => item.nama.toLowerCase().includes(searchNama));
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center" style="padding: 15px;">Data personil tidak ditemukan.</td></tr>`;
+        return;
+      }
+
+      filteredData.forEach((item, index) => {
+        const realIndex = dataKesehatanList.indexOf(item);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="text-center">${index + 1}</td>
+          <td class="text-center"><strong>${item.tanggal}</strong></td>
+          <td><strong>${item.nama}</strong></td>
+          <td>${item.area}</td>
+          <td class="text-center">${item.suhu} °C</td>
+          <td class="text-center">${item.tensimeter}</td>
+          <td class="text-center">${item.oxymeter} %</td>
+          <td class="text-center">${item.img ? `<img src="${item.img}" class="img-preview-matrix">` : '-'}</td>
+          <td class="text-center action-header">
+            <button class="btn-edit" onclick="editKesehatan(${realIndex})">Edit</button>
+            <button class="btn-delete" onclick="hapusKesehatan(${realIndex})">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function editKesehatan(index) {
+      const item = dataKesehatanList[index];
+      document.getElementById('tanggalKesehatan').value = item.rawDate;
+      document.getElementById('namaPersonil').value = item.nama;
+      document.getElementById('areaKesehatan').value = item.area;
+      document.getElementById('suhuBadan').value = item.suhu;
+      document.getElementById('hasilTensimeter').value = item.tensimeter;
+      document.getElementById('oxymeter').value = item.oxymeter;
+      editKesehatanIndex = index;
+      alert('Data dimuat ke form. Silakan ubah lalu klik "Simpan Data Kesehatan".');
+    }
+
+    function hapusKesehatan(index) {
+      if (confirm('Apakah Anda yakin ingin menghapus data kesehatan ini?')) {
+        dataKesehatanList.splice(index, 1);
+        renderTableKesehatan();
+      }
+    }
+
+    function resetFilterKesehatan() {
+      document.getElementById('filterNamaKesehatan').value = '';
+      renderTableKesehatan();
+    }
+
+    /* STOCK BARANG LOGIC */
+    let editStockIndex = null;
+
+    function switchStockTab(type) {
+      const btnMasuk = document.getElementById('btnTabMasuk');
+      const btnKeluar = document.getElementById('btnTabKeluar');
+      const title = document.getElementById('formStockTitle');
+      const submitBtn = document.getElementById('btnSubmitStock');
+      document.getElementById('jenisTransaksi').value = type;
+
+      if (type === 'masuk') {
+        btnMasuk.className = 'tab-btn active-tab-masuk'; btnKeluar.className = 'tab-btn';
+        title.innerText = 'Form Input Pemasukan Barang'; submitBtn.innerText = 'Simpan Pemasukan';
+        submitBtn.className = 'btn-submit';
+      } else {
+        btnKeluar.className = 'tab-btn active-tab-keluar'; btnMasuk.className = 'tab-btn';
+        title.innerText = 'Form Input Pengeluaran Barang'; submitBtn.innerText = 'Simpan Pengeluaran';
+        submitBtn.className = 'btn-submit btn-submit-keluar';
+      }
+    }
+
+    function tambahTransaksiStock(event) {
+      event.preventDefault();
+      const jenis = document.getElementById('jenisTransaksi').value;
+      const rawTanggal = document.getElementById('tanggalStock').value;
+      const kode = document.getElementById('kodeBarang').value.trim().toUpperCase();
+      const noSeri = document.getElementById('noSeri').value.trim().toUpperCase();
+      const nama = document.getElementById('namaBarang').value;
+      const merk = document.getElementById('merkBarang').value;
+      const warna = document.getElementById('warnaBarang').value;
+      const jumlah = parseInt(document.getElementById('jumlahBarang').value, 10);
+      const satuan = document.getElementById('satuanBarang').value;
+
+      const payload = {
+        rawDate: rawTanggal, tanggal: formatIndoDate(rawTanggal),
+        jenis: jenis, kode: kode, nama: nama, merk: merk, noSeri: noSeri, warna: warna, jumlah: jumlah, satuan: satuan
+      };
+
+      if (editStockIndex !== null) {
+        transactionHistory[editStockIndex] = payload;
+        editStockIndex = null;
+        alert('Transaksi berhasil diperbarui!');
+      } else {
+        transactionHistory.push(payload);
+        alert(`Berhasil menyimpan transaksi ${jenis.toUpperCase()}!`);
+      }
+
+      recalculateInventory();
+      renderHistoryTable();
+      renderStockTable();
+      document.getElementById('formStockBarang').reset();
+      document.getElementById('tanggalStock').valueAsDate = new Date();
+    }
+
+    function recalculateInventory() {
+      inventoryMap = {};
+      transactionHistory.forEach(item => {
+        const key = `${item.kode}_${item.noSeri}`;
+        if (!inventoryMap[key]) {
+          inventoryMap[key] = { kode: item.kode, noSeri: item.noSeri, nama: item.nama, merk: item.merk, warna: item.warna, satuan: item.satuan, totalMasuk: 0, totalKeluar: 0 };
+        }
+        if (item.jenis === 'masuk') inventoryMap[key].totalMasuk += item.jumlah;
+        else inventoryMap[key].totalKeluar += item.jumlah;
+      });
+    }
+
+    function renderHistoryTable() {
+      const tbody = document.getElementById('tabelBodyHistory');
+      tbody.innerHTML = '';
+      const startDate = document.getElementById('filterStart').value;
+      const endDate = document.getElementById('filterEnd').value;
+
+      let filteredData = transactionHistory;
+      if (startDate && endDate) {
+        filteredData = transactionHistory.filter(item => item.rawDate >= startDate && item.rawDate <= endDate);
+      }
+
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center" style="padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
+        return;
+      }
+
+      filteredData.forEach((item, index) => {
+        const realIndex = transactionHistory.indexOf(item);
+        const isMasuk = item.jenis === 'masuk';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="text-center">${index + 1}</td>
+          <td class="text-center"><strong>${item.tanggal}</strong></td>
+          <td class="text-center"><span class="badge-transaksi ${isMasuk ? 'badge-masuk' : 'badge-keluar'}">${item.jenis}</span></td>
+          <td>${item.kode}</td>
+          <td><strong>${item.nama}</strong></td>
+          <td>${item.merk}</td>
+          <td>${item.noSeri}</td>
+          <td class="text-center ${isMasuk ? 'txt-masuk' : 'txt-keluar'}">${isMasuk ? '+' : '-'}${item.jumlah}</td>
+          <td class="text-center"><span class="badge-satuan">${item.satuan}</span></td>
+          <td class="text-center action-header">
+            <button class="btn-edit" onclick="editStock(${realIndex})">Edit</button>
+            <button class="btn-delete" onclick="hapusStock(${realIndex})">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function editStock(index) {
+      const item = transactionHistory[index];
+      switchStockTab(item.jenis);
+      document.getElementById('tanggalStock').value = item.rawDate;
+      document.getElementById('kodeBarang').value = item.kode;
+      document.getElementById('noSeri').value = item.noSeri;
+      document.getElementById('namaBarang').value = item.nama;
+      document.getElementById('merkBarang').value = item.merk;
+      document.getElementById('warnaBarang').value = item.warna;
+      document.getElementById('jumlahBarang').value = item.jumlah;
+      document.getElementById('satuanBarang').value = item.satuan;
+      editStockIndex = index;
+      alert('Transaksi dimuat ke form. Silakan sesuaikan lalu klik Simpan.');
+    }
+
+    function hapusStock(index) {
+      if (confirm('Apakah Anda yakin ingin menghapus riwayat transaksi ini?')) {
+        transactionHistory.splice(index, 1);
+        recalculateInventory();
+        renderHistoryTable();
+        renderStockTable();
+      }
+    }
+
+    function resetFilter() {
+      document.getElementById('filterStart').value = '';
+      document.getElementById('filterEnd').value = '';
+      renderHistoryTable();
+    }
+
+    function renderStockTable() {
+      const tbody = document.getElementById('tabelBodyStock');
+      tbody.innerHTML = '';
+      const keys = Object.keys(inventoryMap);
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center" style="padding: 15px;">Belum ada data barang.</td></tr>`;
+        return;
+      }
+      keys.forEach((key, index) => {
+        const item = inventoryMap[key];
+        const sisaStok = item.totalMasuk - item.totalKeluar;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="text-center">${index + 1}</td>
+          <td>${item.kode}</td>
+          <td><strong>${item.nama}</strong></td>
+          <td>${item.merk}</td>
+          <td>${item.noSeri}</td>
+          <td>${item.warna}</td>
+          <td class="text-center"><span class="badge-satuan">${item.satuan}</span></td>
+          <td class="text-center txt-masuk">+${item.totalMasuk}</td>
+          <td class="text-center txt-keluar">-${item.totalKeluar}</td>
+          <td class="text-center txt-sisa">${sisaStok}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    /* PRINT FUNCTIONS */
+    function cetakLaporanKesehatan() {
+      const tbodyContent = document.getElementById('tabelBodyKesehatan').cloneNode(true);
+      tbodyContent.querySelectorAll('.action-header').forEach(el => el.remove());
+
+      const printWindow = window.open('', '', 'height=650,width=900');
+      printWindow.document.write(`<html><head><title>LAPORAN MONITORING KESEHATAN</title><style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th, td { border: 1px solid #000; padding: 6px 8px; text-align: left; }
+        th { background-color: #0f46a0; color: white; text-align: center; }
+        .text-center { text-align: center; }
+        .img-preview-matrix { max-width: 80px; max-height: 60px; }
+      </style></head><body>
+        <h2>LAPORAN MONITORING KESEHATAN PERSONIL</h2>
+        <table><thead><tr><th>No</th><th>Tanggal</th><th>Nama Personil</th><th>Area</th><th>Suhu (°C)</th><th>Hasil Tensimeter</th><th>Oxymeter (%)</th><th>Eviden Foto</th></tr></thead>
+        <tbody>${tbodyContent.innerHTML}</tbody></table>
+      </body></html>`);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+    }
+
+    function cetakLaporanDirect(tbodyId, keyCategory, judulLaporan) {
+      const tbodyClone = document.getElementById(tbodyId).cloneNode(true);
+      tbodyClone.querySelectorAll('.action-cell').forEach(el => el.remove());
+
+      const printWindow = window.open('', '', 'height=650,width=900');
+      printWindow.document.write(`<html><head><title>${judulLaporan}</title><style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1.5px solid #000; padding: 8px; text-align: center; }
+        th { background-color: #2d6a4f; color: white; }
+        .img-preview-matrix { max-width: 100px; max-height: 75px; }
+      </style></head><body>
+        <h2>${judulLaporan}</h2>
+        <table><thead><tr><th>Tanggal</th><th>Tanjung Sari</th><th>Sumedang Kota</th><th>Majalengka</th><th>Jatiwangi</th></tr></thead>
+        <tbody>${tbodyClone.innerHTML}</tbody></table>
+      </body></html>`);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+    }
+
+    function cetakLaporanStock() {
+      const historyClone = document.getElementById('tabelBodyHistory').cloneNode(true);
+      historyClone.querySelectorAll('.action-header').forEach(el => el.remove());
+
+      const printWindow = window.open('', '', 'height=650,width=900');
+      printWindow.document.write(`<html><head><title>LAPORAN STOK BARANG</title><style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background-color: #0f46a0; color: white; text-align: center; }
+        .text-center { text-align: center; }
+      </style></head><body>
+        <h2>LAPORAN PEMASUKAN, PENGELUARAN & SISA STOK</h2>
+        <h3>1. Riwayat Transaksi</h3>
+        <table><thead><tr><th>No</th><th>Tanggal</th><th>Jenis</th><th>Kode</th><th>Nama Barang</th><th>Merk</th><th>No. Seri</th><th>Jumlah</th><th>Satuan</th></tr></thead>
+        <tbody>${historyClone.innerHTML}</tbody></table>
+        <h3>2. Total Sisa Stok Saat Ini</h3>
+        <table><thead><tr><th>No</th><th>Kode</th><th>Nama Barang</th><th>Merk</th><th>No. Seri</th><th>Warna</th><th>Satuan</th><th>Total Masuk</th><th>Total Keluar</th><th>Sisa Stok</th></tr></thead>
+        <tbody>${document.getElementById('tabelBodyStock').innerHTML}</tbody></table>
+      </body></html>`);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+    }
+  </script>
+</body>
+</html>
