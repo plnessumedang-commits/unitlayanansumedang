@@ -126,7 +126,7 @@
       <a class="nav-btn active" onclick="switchMenu('Home', this)">Beranda</a>
       <a class="nav-btn" onclick="switchMenu('safety-briefing', this)">Safety Briefing</a>
       <a class="nav-btn" onclick="switchMenu('lima-r', this)">5R</a>
-      <a class="nav-btn" onclick="switchMenu('management-alat', this)">Management Alat</a>
+      <a class="nav-btn" onclick="switchMenu('Inspeksi-alat', this)">Inspeksi Alat</a>
       <a class="nav-btn" onclick="switchMenu('rambu-rambu', this)">Rambu-rambu</a>
       <a class="nav-btn" onclick="switchMenu('monitoring-kesehatan', this)">Monitoring Kesehatan</a>
     </div>
@@ -204,7 +204,7 @@
       <h1>Safety Briefing</h1>
       <div class="briefing-container">
         <div class="form-section">
-          <h2>Input Safety Briefing</h2>
+          <h2>Input DokumentasiSafety Briefing</h2>
           <form id="formSafetyBriefing" onsubmit="tambahData(event, 'SafetyBriefing', 'tabelBodySafetyBriefing', false)">
             <div class="form-group"><label>Tanggal Pelaksanaan:</label><input type="date" id="tanggalSafetyBriefing" required></div>
             <div class="form-group"><label>Nama Area:</label>
@@ -274,10 +274,10 @@
     </div>
   </main>
 
-  <!-- Management Alat -->
-  <main id="management-alat" class="content-card wide-card">
+  <!-- Inspeksi Alat -->
+  <main id="Inspeksi-alat" class="content-card wide-card">
     <div class="content-body">
-      <h1>Management Alat</h1>
+      <h1>Inspeksi Alat</h1>
       <div class="briefing-container">
         <div class="form-section">
           <h2>Input Inspeksi Alat</h2>
@@ -293,7 +293,7 @@
           </form>
         </div>
         <div class="report-section">
-          <h2>Hasil Laporan Management Alat</h2>
+          <h2>Hasil Laporan Inspeksi Alat</h2>
           <div class="filter-box">
             <div><label>Dari Bulan:</label><input type="month" id="filterStartAlat"></div>
             <div><label>Sampai Bulan:</label><input type="month" id="filterEndAlat"></div>
@@ -306,7 +306,7 @@
               <tbody id="tabelBodyAlat"></tbody>
             </table>
           </div>
-          <button type="button" class="btn-print" onclick="cetakLaporanDirect('headerAlat', 'tabelBodyAlat', 'LAPORAN MANAGEMENT ALAT')">🖨️ Cetak Laporan</button>
+          <button type="button" class="btn-print" onclick="cetakLaporanDirect('headerAlat', 'tabelBodyAlat', 'LAPORAN INSPEKSI ALAT')">🖨️ Cetak Laporan</button>
         </div>
       </div>
     </div>
@@ -315,10 +315,10 @@
   <!-- Rambu-rambu -->
   <main id="rambu-rambu" class="content-card wide-card">
     <div class="content-body">
-      <h1>Rambu-Rambu Keselamatan</h1>
+      <h1>Dokumentasi Rambu-Rambu</h1>
       <div class="briefing-container">
         <div class="form-section">
-          <h2>Input Inspeksi Rambu</h2>
+          <h2>Input Dokumentasi Rambu</h2>
           <form id="formRambu" onsubmit="tambahData(event, 'Rambu', 'tabelBodyRambu', true)">
             <div class="form-group"><label>Bulan & Tahun Inspeksi:</label><input type="month" id="tanggalRambu" required></div>
             <div class="form-group"><label>Nama Area:</label>
@@ -381,7 +381,7 @@
             </div>
 
             <div class="form-group"><label>Oxymeter SpO2 (%):</label><input type="number" id="oxymeter" placeholder="98" min="0" max="100" required></div>
-            <div class="form-group"><label>Eviden Foto:</label><input type="file" id="evidenKesehatan" accept="image/*"></div>
+            <div class="form-group"><label>Dokumentasi:</label><input type="file" id="dokumentasiKesehatan" accept="image/*"></div>
             <button type="submit" class="btn-submit">Simpan Data Kesehatan</button>
           </form>
         </div>
@@ -406,7 +406,7 @@
                   <th>Suhu (°C)</th>
                   <th>Hasil Tensimeter</th>
                   <th>Oxymeter (%)</th>
-                  <th>Eviden Foto</th>
+                  <th>Dokumentasi</th>
                   <th class="action-header">Aksi</th>
                 </tr>
               </thead>
@@ -745,7 +745,7 @@
       const suhu = document.getElementById('suhuBadan').value;
       const tensimeter = document.getElementById('hasilTensimeter').value;
       const oxymeter = document.getElementById('oxymeter').value;
-      const fotoInput = document.getElementById('evidenKesehatan');
+      const fotoInput = document.getElementById('dokumentasiKesehatan');
 
       const processSave = (imgSrc) => {
         const payload = {
@@ -853,7 +853,7 @@
         .img-preview-matrix { max-width: 80px; max-height: 60px; }
       </style></head><body>
         <h2>LAPORAN MONITORING KESEHATAN PERSONIL</h2>
-        <table><thead><tr><th>No</th><th>Tanggal</th><th>Nama Personil</th><th>Area</th><th>Suhu (°C)</th><th>Hasil Tensimeter</th><th>Oxymeter (%)</th><th>Eviden Foto</th></tr></thead>
+        <table><thead><tr><th>No</th><th>Tanggal</th><th>Nama Personil</th><th>Area</th><th>Suhu (°C)</th><th>Hasil Tensimeter</th><th>Oxymeter (%)</th><th>Dokumentasi</th></tr></thead>
         <tbody>${tbodyContent.innerHTML}</tbody></table>
       </body></html>`);
       printWindow.document.close();
